@@ -29,18 +29,18 @@ const isIphone = (/iphone|ipad/gi).test(navigator.appVersion);
 const init_jssdk = (callback, url) => {
 	let nonceStr = 'boss'
 	let timestamp = dayjs('2019-01-25').unix()
-
+	
+	//这里调用了后台接口，后台处理获取签名
 	MAIN.app.$u.api.getSignature({
 		url,
 		timestamp,
 		noncestr: nonceStr,
 	}).then(res => {
-		console.log("初始化配置参数===>",JSON.stringify(res));
 		if (res.data) {
 			wx.config({
 				beta: true, // 必须这么写，否则wx.invoke调用形式的jsapi会有问题
 				debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
-				appId: 'wwa18cd68e40360c58', // 必填，企业微信的corpID
+				appId: 'ww.....', // 必填，企业微信的corpID
 				timestamp: timestamp, // 必填，生成签名的时间戳
 				nonceStr: nonceStr, // 必填，生成签名的随机串
 				signature: res.data, // 必填，签名，见 附录-JS-SDK使用权限签名算法
@@ -56,11 +56,10 @@ const init_jssdk = (callback, url) => {
 			callback(res)
 		}
 	})
-
 }
 
-// 分享操作
-const share = (data, url) => {
+// 获取定位
+const getLocation = (data, url) => {
 	url = url ? url : window.location.href;
 	if (!isWechat()) {
 		return;
@@ -72,10 +71,6 @@ const share = (data, url) => {
 			type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
 			success: function(res) {
 				console.log('res==>', res)
-				var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
-				var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
-				var speed = res.speed; // 速度，以米/每秒计
-				var accuracy = res.accuracy; // 位置精度
 			},
 			fail: (res) => {
 				console.log('获取信息失败res==>', res)
@@ -96,21 +91,22 @@ const closeWindow = (url) => {
 	}, url);
 }
 
-// 微信公众号授权
+// 微信授权
 const wxAuthorize = () => {
 	// 已经授权登录过的就不用再授权了
 	if (MAIN.app.vuex_logoInfo) return;
 
 	let code = util.getQueryString('code')
-	// 如果拿到code，调用授权接口，没有拿到就跳转微信授权链接获取
-	if (code && code != '') {
-		// api.wxAuth(params.code); // 调用后台接口，授权
+
+	// 如果拿到code，可以调用授权接口，没有拿到就跳转微信授权链接获取
+	if (!!code) {
+		// 这里可以调用后台接口，授权
 	} else {
 		let appid = 'ww.........'; //ww开头的appid
 
 		let uri = encodeURIComponent(window.location.href);
 
-		let scope = 'snsapi_base';
+		let scope = 'snsapi_base'; // 静默授权
 		// let scope = 'snsapi_userinfo'; // 获取用户信息
 
 		let agentid = 1000006;  //agentid
@@ -123,7 +119,7 @@ const wxAuthorize = () => {
 export {
 	isWechat,
 	isIphone,
-	share,
+	getLocation,
 	closeWindow,
 	wxAuthorize,
 }

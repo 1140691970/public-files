@@ -14,6 +14,7 @@
 			}
 		},
 		onLoad() {
+			// 获取到code就存入缓存，否则跳登录页面
 			let code = this.util.getQueryString('code')
 			try {
 				if (code && code != '') {
