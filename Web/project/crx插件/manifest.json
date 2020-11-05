@@ -1,0 +1,42 @@
+{
+    "manifest_version": 2,
+    "name": "douYin",
+    "version": "1.0.0",
+    "description": "A plain text description",
+    "icons": {
+        "128": "images/icon.png"
+    },
+    "background": {
+        "scripts": [
+            "js/background.js"
+        ]
+    },
+    "permissions": [
+        "contextMenus", 
+		"tabs", 
+		"notifications", 
+		"webRequest",
+		"webRequestBlocking",
+		"storage", 
+        "http://*/*",
+        "https://*/*"
+    ],
+    "web_accessible_resources": ["js/inject.js"],
+    "browser_action": {
+        "default_title": "这是douYin插件",
+        "default_icon": "images/icon.png",
+        "default_popup": "popup.html"
+    },
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "css": [
+                "mystyles.css"
+            ],
+            "js": [
+                "js/jquery.min.js",
+                "js/content_scripts.js"
+            ]
+        }
+    ]
+}
